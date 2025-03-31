@@ -1,0 +1,5 @@
+node_modules/
+.env
+package-lock.json
+/doctor-appointment/node_modules
+/doctor-appointment/package-lock.json
