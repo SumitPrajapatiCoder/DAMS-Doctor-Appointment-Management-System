@@ -17,7 +17,7 @@ const Home_page = () => {
   const [userRole, setUserRole] = useState(localStorage.getItem('role'));
   const [currentPage, setCurrentPage] = useState(1);
   const [specializationFilter, setSpecializationFilter] = useState('all');
-  const doctorsPerPage = 4;
+  const doctorsPerPage = 3;
 
   const isNewUser = !user?.hasRoleStatus && !localStorage.getItem('role');
 
@@ -31,6 +31,7 @@ const Home_page = () => {
       console.log(error);
     }
   };
+  
 
   useEffect(() => {
     get_User_data();

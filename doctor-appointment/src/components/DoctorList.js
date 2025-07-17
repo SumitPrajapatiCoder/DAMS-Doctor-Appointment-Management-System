@@ -4,7 +4,9 @@ import { useNavigate } from "react-router-dom";
 
 const DoctorList = ({ doctor }) => {
     const navigate = useNavigate();
-    const doctorImage = doctor.image || require("../Photo/doctorPhoto.JPG");
+    const doctorImage = doctor.image
+        ? `http://localhost:8080${doctor.image}`
+        : require("../Photo/doctorPhoto.JPG");
 
     return (
         <div

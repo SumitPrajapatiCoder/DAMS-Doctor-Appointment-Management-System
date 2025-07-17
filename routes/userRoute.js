@@ -6,7 +6,7 @@ const { loginController, registerController, authController,
     userAppointmentController,
     getBookedSlotsController,
     getBookedSlotsWithStatusController,
-    setRoleController,
+    setRoleController,upload,uploadPhotoController,
     setHasRoleStatusController} = require("../controller/userControl");
 const authMiddleware=require("../middlewares/authMiddleware");
 
@@ -25,6 +25,9 @@ router.post('/get_User_data', authMiddleware, authController);
 
 //Apply Doctor
 router.post('/apply_doctor', authMiddleware, applyDoctorController);
+
+//Upload Photo 
+router.post("/uploadPhoto", authMiddleware, upload.single("image"), uploadPhotoController);
 
 //Apply Doctor Notification
 router.post('/get_all_notification', authMiddleware, getAllNotificationController);

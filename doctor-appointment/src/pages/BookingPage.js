@@ -16,6 +16,7 @@ const BookingPage = () => {
     const params = useParams();
     const [slots, setSlots] = useState([]);
     const [bookedSlots, setBookedSlots] = useState([]);
+    const [selectedSlot, setSelectedSlot] = useState(null);
 
     const generateDateOptions = () => {
         let dates = [];
@@ -60,16 +61,23 @@ const BookingPage = () => {
 
     const generateTimeSlots = () => {
         if (!doctor.timings) return [];
+
         const [start, end] = doctor.timings;
-        let slots = [];
+        let slotList = [];
         let currentTime = dayjs(start, 'HH:mm');
         const endTime = dayjs(end, 'HH:mm');
+        const today = dayjs().format('DD-MM-YYYY');
+        const now = dayjs();
 
         while (currentTime.isBefore(endTime)) {
-            slots.push(currentTime.format('HH:mm'));
+            // Only include future time slots if the selected date is today
+            if (selectedDate !== today || currentTime.isAfter(now)) {
+                slotList.push(currentTime.format('HH:mm'));
+            }
             currentTime = currentTime.add(1, 'hour');
         }
-        setSlots(slots);
+
+        setSlots(slotList);
     };
 
     const handleBooking = async (time) => {
@@ -88,10 +96,14 @@ const BookingPage = () => {
             dispatch(hideLoading());
             if (res.data.success) {
                 toast.success(res.data.message, { position: "top-right" });
+                setSelectedSlot(time);
                 fetchBookedSlots();
+            } else {
+                toast.error(res.data.message || "Booking failed");
             }
         } catch (error) {
             dispatch(hideLoading());
+            toast.error("Failed to book the appointment. Try again.");
             console.log(error);
         }
     };
@@ -99,7 +111,6 @@ const BookingPage = () => {
     useEffect(() => {
         fetchDoctorData();
     }, []);
-
 
     useEffect(() => {
         if (doctor.timings) generateTimeSlots();
@@ -122,34 +133,35 @@ const BookingPage = () => {
             <h3 className='text-center'>Booking Page</h3>
             <div className='container'>
                 {doctor && (
-                    <div className='m-2'>
+                    <div className='card p-4 shadow-sm mt-3'>
                         <h4>Dr. {doctor.firstName} {doctor.lastName}</h4>
-                        <h4>Specialization: {doctor.specialization}</h4>
-                        <h4>Fees: {doctor.feesPerConsultation}</h4>
-                        <h4>Address: {doctor.address}</h4>
-                        <h4>Available Time: {doctor.timings?.[0]} - {doctor.timings?.[1]}</h4>
-                        <div className="mt-2">
+                        <h5>Specialization: {doctor.specialization}</h5>
+                        <h5>Fees: ₹{doctor.feesPerConsultation}</h5>
+                        <h5>Address: {doctor.address}</h5>
+                        <h5>Available Time: {doctor.timings?.[0]} - {doctor.timings?.[1]}</h5>
+
+                        <div className="mt-3 mb-3">
                             <div className="d-flex gap-3 flex-wrap">
                                 <div className="d-flex align-items-center gap-1">
-                                    <div style={{ width: '20px', height: '20px', borderRadius: '3px', backgroundColor: 'green' }}></div>
+                                    <div style={{ width: '20px', height: '20px', backgroundColor: 'green' }}></div>
                                     <span>Free Slot</span>
                                 </div>
                                 <div className="d-flex align-items-center gap-1">
-                                    <div style={{ width: '20px', height: '20px', borderRadius: '3px', backgroundColor: 'red' }}></div>
+                                    <div style={{ width: '20px', height: '20px', backgroundColor: 'red' }}></div>
                                     <span>Approved Slot</span>
                                 </div>
                                 <div className="d-flex align-items-center gap-1">
-                                    <div style={{ width: '20px', height: '20px', borderRadius: '3px', backgroundColor: 'yellow' }}></div>
+                                    <div style={{ width: '20px', height: '20px', backgroundColor: 'yellow' }}></div>
                                     <span>Pending Slot</span>
                                 </div>
                                 <div className="d-flex align-items-center gap-1">
-                                    <div style={{ width: '20px', height: '20px', borderRadius: '3px', backgroundColor: 'grey' }}></div>
+                                    <div style={{ width: '20px', height: '20px', backgroundColor: 'grey' }}></div>
                                     <span>Rejected Slot</span>
                                 </div>
                             </div>
-                        </div><br />
+                        </div>
 
-                        <div className="d-flex gap-2 mt-2">
+                        <div className="d-flex gap-2 mt-2 flex-wrap">
                             {dateOptions.map((dateOption, index) => (
                                 <button
                                     key={index}
@@ -161,17 +173,21 @@ const BookingPage = () => {
                             ))}
                         </div>
 
-                        <div className='d-flex flex-wrap gap-2 mt-3'>
-                            {slots.map((slot, index) => (
-                                <button
-                                    key={index}
-                                    className={`btn btn-block ${getSlotClass(slot)}`}
-                                    onClick={() => !bookedSlots.some((s) => s.time === slot && s.status === 'approved') && handleBooking(slot)}
-                                    disabled={bookedSlots.some((s) => s.time === slot && s.status === 'approved')}
-                                >
-                                    {dayjs(selectedDate, 'DD-MM-YYYY').format('ddd, DD MMM')} | {slot}
-                                </button>
-                            ))}
+                        <div className='d-grid' style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px', marginTop: '1rem' }}>
+                            {slots.length > 0 ? (
+                                slots.map((slot, index) => (
+                                    <button
+                                        key={index}
+                                        className={`btn ${getSlotClass(slot)} ${selectedSlot === slot ? 'border border-dark' : ''}`}
+                                        onClick={() => !bookedSlots.some((s) => s.time === slot && s.status === 'approved') && handleBooking(slot)}
+                                        disabled={bookedSlots.some((s) => s.time === slot && s.status === 'approved')}
+                                    >
+                                        {dayjs(selectedDate, 'DD-MM-YYYY').format('ddd, DD MMM')} | {slot}
+                                    </button>
+                                ))
+                            ) : (
+                                <div className="alert alert-info col-12 text-center">No slots available for selected date.</div>
+                            )}
                         </div>
                     </div>
                 )}

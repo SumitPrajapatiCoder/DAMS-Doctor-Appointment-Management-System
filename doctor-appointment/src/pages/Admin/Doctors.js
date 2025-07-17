@@ -85,24 +85,6 @@ const Doctors = () => {
       ],
       onFilter: (value, record) => record.status === value
     },
-    // {
-    //   title: 'Actions',
-    //   dataIndex: 'actions',
-    //   render: (_, record) => (
-    //     <div className='d-flex gap-2'>
-    //       {record.status === 'pending' ? (
-    //         <>
-    //           <Button type='primary' onClick={() => handleAccountUpdate(record, 'approved')}>Approve</Button>
-    //           <Button danger onClick={() => handleAccountUpdate(record, 'rejected')}>Reject</Button>
-    //         </>
-    //       ) : record.status === 'approved' ? (
-    //         <Button danger onClick={() => handleAccountUpdate(record, 'released')}>Release Doctor</Button>
-    //       ) : (
-    //         <Tag color='grey'>{record.status.toUpperCase()}</Tag>
-    //       )}
-    //     </div>
-    //   )
-    // }
     {
       title: 'Actions',
       dataIndex: 'actions',

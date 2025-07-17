@@ -1,4 +1,3 @@
-
 const dotenv = require("dotenv");
 dotenv.config();  
 const express = require("express");
@@ -24,7 +23,8 @@ app.use(morgan("dev"));
 // Routes
 app.use('/api/v1/user', require("./routes/userRoute"));
 app.use('/api/v1/admin', require("./routes/adminRoute"));
-app.use('/api/v1/doctor',require("./routes/doctorRoute"));
+app.use('/api/v1/doctor', require("./routes/doctorRoute"));
+app.use("/uploads", express.static("public/uploads"));
 
 
 

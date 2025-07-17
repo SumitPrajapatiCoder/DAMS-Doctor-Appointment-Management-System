@@ -39,43 +39,6 @@ const getAllDoctorsController = async (req, res) => {
 };
 
 
-
-// const changeAccountStatusController = async (req, res) => {
-//     try {
-//         const { doctorId, status } = req.body;
-//         const doctor = await doctorModel.findByIdAndUpdate(doctorId, { status }, { new: true });
-//         const user = await userModel.findOne({ _id: doctor.userId });
-//         const notification = user.notification;
-
-//         if (status === 'released') {
-//             notification.push({
-//                 type: 'doctor-account-released',
-//                 message: `${doctor.firstName} ${doctor.lastName} - Doctor has been released from the system`,
-//                 onClickPath: '/notification'
-//             });
-//             user.isDoctor = false;
-//         } else {
-//             notification.push({
-//                 type: 'doctor-account-request-updated',
-//                 message: `${doctor.firstName} ${doctor.lastName} - Doctor Request Has ${status}`,
-//                 onClickPath: '/notification'
-//             });
-//             user.isDoctor = status === 'approved' ? true : false;
-//         }
-
-//         await user.save();
-//         res.status(201).send({ message: 'Account Status Updated', success: true, data: doctor });
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).send({
-//             message: 'Error During Account Change Status',
-//             success: false,
-//             error
-//         });
-//     }
-// };
-
-
 const changeAccountStatusController = async (req, res) => {
     try {
         const { doctorId, status } = req.body;

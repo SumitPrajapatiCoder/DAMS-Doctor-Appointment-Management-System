@@ -48,8 +48,11 @@ const doctorSchema = new mongoose.Schema({
         type:Object,
         required:[true,'Work Timing Is Required']
     },
-
-
+    
+    image: {
+        type: String,
+        default: "",
+    },
 
 },{timestamps:true});
 
