@@ -155,8 +155,6 @@ This project is a full-stack web application that allows patients to book appoin
 ```
 
 📸 **Screenshots**
-
-*(Add screenshots of the application here)*
 <img width="1340" height="603" alt="image" src="https://github.com/user-attachments/assets/3ae3dd9d-f0a5-4cf5-b4a2-0316aa987970" />
 
 <img width="1114" height="479" alt="image" src="https://github.com/user-attachments/assets/bd412f3c-a059-4ee0-b047-f24e4bf998fe" />
