@@ -158,14 +158,24 @@ This project is a full-stack web application that allows patients to book appoin
 
 *(Add screenshots of the application here)*
 <img width="1340" height="603" alt="image" src="https://github.com/user-attachments/assets/3ae3dd9d-f0a5-4cf5-b4a2-0316aa987970" />
+
 <img width="1114" height="479" alt="image" src="https://github.com/user-attachments/assets/bd412f3c-a059-4ee0-b047-f24e4bf998fe" />
+
 <img width="1122" height="590" alt="image" src="https://github.com/user-attachments/assets/166f28cd-e53b-42d7-af8f-6340b9665fb3" />
+
 <img width="1355" height="593" alt="image" src="https://github.com/user-attachments/assets/23db0b9b-60ee-4fb0-97b4-4e2d9ad1d768" />
+
 <img width="1348" height="602" alt="image" src="https://github.com/user-attachments/assets/a5324fc2-4cf6-4853-8942-4ceba4748374" />
+
 <img width="1110" height="595" alt="image" src="https://github.com/user-attachments/assets/96af7cbd-4a84-45a4-b0f8-2a714d862c20" />
+
 <img width="1109" height="335" alt="image" src="https://github.com/user-attachments/assets/1b83fd57-4b98-4e83-967e-acccaa580079" />
+
 <img width="1116" height="375" alt="image" src="https://github.com/user-attachments/assets/51d6afcc-b526-452f-bdec-15328e904887" />
+
 <img width="1117" height="353" alt="image" src="https://github.com/user-attachments/assets/feea99d3-f23a-48c7-ace7-973d32ec1424" />
+
 <img width="1116" height="373" alt="image" src="https://github.com/user-attachments/assets/d300b917-378d-4225-b42e-a280835915a7" />
+
 <img width="1112" height="352" alt="image" src="https://github.com/user-attachments/assets/926cd79a-282a-44c4-8a30-b297e97a5bca" />
 
