@@ -4,6 +4,11 @@ const userModel = require("../models/userModel");
 module.exports = async (req, res, next) => {
     try {
         const token = req.headers['authorization']?.split(" ")[1];
+        // const token = req.headers.authorization?.split(" ")[1];
+        // if (!token) {
+        //     return res.status(401).send({ message: "Auth Failed" });
+        // }
+
 
         if (!token) {
             return res.status(401).send({ message: "Auth Failed: No token provided", success: false });
@@ -20,16 +25,16 @@ module.exports = async (req, res, next) => {
                 return res.status(404).send({ message: "User not found", success: false });
             }
 
-            
+
             if (user.isBlocked && !user.isAdmin) {
                 return res.status(403).send({ message: "Your account has been blocked", success: false });
             }
 
             req.body.userId = req.body.userId || decode.id;
-            req.body.isAdmin = user.isAdmin; 
+            req.body.isAdmin = user.isAdmin;
 
 
-            
+
             req.user = { id: decode.id, isAdmin: user.isAdmin };
 
             next();
@@ -39,3 +44,19 @@ module.exports = async (req, res, next) => {
         res.status(500).send({ message: "Internal Server Error", success: false });
     }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

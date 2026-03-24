@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Layout from '../components/Layout';
+import Layout from '../../components/Layout';
 import axios from 'axios';
 import { Table, Tag, Select, Spin, Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
@@ -13,7 +13,7 @@ const AppointmentList = () => {
     const [statusFilter, setStatusFilter] = useState('all');
     const [loading, setLoading] = useState(true);
     const [searchText, setSearchText] = useState('');
-      const navigate = useNavigate();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const getAppointment = async () => {
@@ -24,9 +24,14 @@ const AppointmentList = () => {
                     }
                 });
                 if (res.data.success) {
-                    setAppointments(res.data.data);
-                    setFilteredAppointments(res.data.data);
+                    const sortedAppointments = res.data.data.sort(
+                        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+                    );
+
+                    setAppointments(sortedAppointments);
+                    setFilteredAppointments(sortedAppointments);
                 }
+
             } catch (error) {
                 console.log(error);
             } finally {
@@ -61,7 +66,7 @@ const AppointmentList = () => {
             dataIndex: '_id',
             render: (id, record) => (
                 <span
-                    style={{ color: '#1890ff', cursor: 'pointer', textDecoration: 'underline' }}
+                    style={{ color: '#1e4fa3', cursor: 'pointer', textDecoration: 'underline' }}
                     onClick={() => navigate(`/doctor/book-appointment/${record.doctorId?._id}`)}
                 >
                     {id}
@@ -92,6 +97,37 @@ const AppointmentList = () => {
             render: (text, record) => (
                 <span>{record.date} - {record.time}</span>
             )
+        },
+        {
+            title: "Payment",
+            render: (_, record) => {
+                if (record.status === "approved" && !record.isPaid) {
+                    return (
+                        <button
+                            className="btn btn-primary"
+                            onClick={() => navigate(`/user/payment/${record._id}`)}
+                        >
+                            Pay Now
+                        </button>
+                    );
+                }
+                if (record.isPaid && record.paymentId) {
+                    return (
+                        <>
+                            <Tag color="green">PAID</Tag>
+                            <br />
+                            <button
+                                className="btn btn-link p-0"
+                                onClick={() => navigate(`/receipt/${record.paymentId}`)}
+                            >
+                                View Receipt
+                            </button>
+                        </>
+                    );
+                }
+
+                return <Tag>---</Tag>;
+            }
         },
         {
             title: 'Status',
@@ -126,7 +162,7 @@ const AppointmentList = () => {
             <h1 style={{ textAlign: 'center', marginBottom: 20 }}>Appointment List</h1>
 
             <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginBottom: 16 }}>
-               
+
                 <Select
                     value={statusFilter}
                     onChange={handleStatusFilter}
@@ -138,7 +174,7 @@ const AppointmentList = () => {
                     <Option value="rejected">Rejected</Option>
                 </Select>
 
-                
+
                 <Input
                     placeholder="Search by name or specialization..."
                     value={searchText}
@@ -148,7 +184,7 @@ const AppointmentList = () => {
                 />
             </div>
 
-           
+
             {loading ? (
                 <Spin tip="Loading appointments..." size="large" style={{ display: 'block', margin: '0 auto' }} />
             ) : (

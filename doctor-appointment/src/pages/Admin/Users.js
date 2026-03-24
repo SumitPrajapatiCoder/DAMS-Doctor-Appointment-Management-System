@@ -15,7 +15,7 @@ const Users = () => {
   const getUsers = async () => {
     try {
       const res = await axios.get('/api/v1/admin/get_All_Users', {
-        headers: { Authorization: `bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       if (res.data.success) {
         setUsers(res.data.data);

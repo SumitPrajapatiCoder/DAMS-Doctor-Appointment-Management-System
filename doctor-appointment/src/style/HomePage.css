@@ -1,0 +1,322 @@
+/* ================= ROOT BACKGROUND ================= */
+.app-background {
+  min-height: 100vh;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    120deg,
+    #eef4ff,
+    #f6f9ff,
+    #edf3ff
+  );
+  background-size: 400% 400%;
+  animation: gradientFlow 20s ease infinite;
+}
+
+/* ================= DOCTOR CARD ================= */
+.doctor-card {
+  width: 100%;
+  max-width: 320px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  transition: all 0.35s ease;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Hover effect */
+.doctor-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 14px 28px rgba(0,0,0,0.15);
+}
+
+/* ================= CARD TOP BACKGROUND ================= */
+.doctor-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 0 40px;
+  background: linear-gradient(135deg,#eaf2ff,#f5f8ff);
+  position: relative;
+}
+
+/* Profile image */
+.doctor-image img {
+  width: 95px;
+  height: 95px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #ffffff;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  transition: transform 0.3s ease;
+}
+
+/* Avatar animation */
+.doctor-card:hover .doctor-image img {
+  transform: scale(1.08);
+}
+
+/* ================= CARD CONTENT ================= */
+.doctor-info {
+  padding: 18px;
+  text-align: center;
+}
+
+/* Doctor name */
+.doctor-name {
+  color: #1e4fa3;
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 6px;
+}
+
+/* Specialization badge */
+.doctor-specialization {
+  display: inline-block;
+  background: linear-gradient(135deg,#4a90e2,#5aa6ff);
+  color: white;
+  font-size: 12px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+/* Details */
+.doctor-info p {
+  font-size: 13px;
+  margin: 4px 0;
+  color: #444;
+}
+
+/* ================= BOOK BUTTON ================= */
+.book-btn {
+  width: 100%;
+  margin-top: 14px;
+  background: linear-gradient(135deg,#1e4fa3,#3367d6);
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  transition: all 0.25s ease;
+}
+
+/* Button hover */
+.book-btn:hover {
+  background: linear-gradient(135deg,#163b7a,#1e4fa3);
+  transform: scale(1.03);
+}
+
+/* Gradient animation */
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* ================= FLOATING MOTION SHAPES ================= */
+.app-background::before,
+.app-background::after {
+  content: "";
+  position: fixed;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(74, 144, 226, 0.18),
+    transparent 70%
+  );
+  animation: floatMotion 22s ease-in-out infinite alternate;
+  z-index: 0;
+}
+
+.app-background::before {
+  top: -140px;
+  left: -140px;
+}
+
+.app-background::after {
+  bottom: -160px;
+  right: -160px;
+  animation-delay: 6s;
+}
+
+@keyframes floatMotion {
+  from {
+    transform: translateY(0px) translateX(0px);
+  }
+  to {
+    transform: translateY(70px) translateX(40px);
+  }
+}
+
+/* ================= ENSURE CONTENT STAYS ABOVE ================= */
+.app-background > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* ================= TITLE ================= */
+.home-title {
+  text-align: center;
+  font-size: 34px;
+  font-weight: 600;
+  margin-bottom: 22px;
+  color: #1f2d3d;
+  animation: fadeSlideDown 0.8s ease;
+}
+
+@keyframes fadeSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================= SEARCH BAR ================= */
+.home-search-bar {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  animation: fadeIn 1s ease;
+}
+
+.home-search-input {
+  width: 300px;
+}
+
+.home-search-select {
+  width: 200px;
+}
+
+/* ================= GRID ================= */
+.home-doctor-row {
+  margin-top: 10px;
+}
+
+/* ================= EMPTY TEXT ================= */
+.home-no-data {
+  width: 100%;
+  text-align: center;
+  color: #777;
+  font-size: 16px;
+}
+
+/* ================= PAGINATION ================= */
+.home-pagination {
+  display: flex;
+  justify-content: center;
+  margin: 35px 0;
+  animation: fadeInUp 0.8s ease;
+}
+
+/* ================= MODAL ================= */
+.home-role-modal .ant-modal-content {
+  border-radius: 14px;
+  padding: 26px;
+  text-align: center;
+  background: linear-gradient(135deg, #fdfefe, #f4f8ff);
+}
+
+.role-title {
+  font-weight: 600;
+  margin-bottom: 12px;
+  font-size: 22px;
+}
+
+.role-text {
+  color: #555;
+  margin-bottom: 22px;
+  line-height: 1.6;
+}
+
+.role-btn-group {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+/* ================= ROLE BUTTONS ================= */
+.role-btn {
+  width: 45%;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 10px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.role-btn:hover {
+  transform: translateY(-3px);
+}
+
+.patient-btn {
+  background: linear-gradient(135deg, #4a90e2, #5aa6ff);
+  color: white;
+  box-shadow: 0 6px 16px rgba(74, 144, 226, 0.35);
+}
+
+.doctor-btn {
+  background: linear-gradient(135deg, #6a0dad, #8b2fd6);
+  color: white;
+  box-shadow: 0 6px 16px rgba(106, 13, 173, 0.35);
+}
+
+/* ================= COMMON FADE ================= */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .home-title {
+    font-size: 26px;
+  }
+
+  .home-search-input,
+  .home-search-select {
+    width: 100%;
+  }
+
+  .role-btn {
+    width: 100%;
+  }
+
+  .role-btn-group {
+    flex-direction: column;
+  }
+}
+

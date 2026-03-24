@@ -1,20 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import Layout from '../../components/Layout';
 import axios from 'axios';
-import { Table, Button, Tag, Input, Space } from 'antd';
+import { Table, Button, Tag, Input, Space, Modal, Descriptions } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
+
+console.log("Doctors component loaded");
 
 const Doctors = () => {
   const [doctors, setDoctors] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [filteredDoctors, setFilteredDoctors] = useState([]);
 
+  const [isDoctorInfoOpen, setIsDoctorInfoOpen] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+
+
   const getDoctors = async () => {
     try {
       const res = await axios.get('/api/v1/admin/get_All_Doctors', {
-        headers: { Authorization: `bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       if (res.data.success) {
         setDoctors(res.data.data);
@@ -25,6 +32,14 @@ const Doctors = () => {
     }
   };
 
+  //doctor info handler
+
+  const handleDoctorInfo = (record) => {
+    setSelectedDoctor(record);
+    setIsDoctorInfoOpen(true);
+  };
+
+
   const handleAccountUpdate = async (record, status) => {
     try {
       const res = await axios.post('/api/v1/admin/changes_Account_Status', {
@@ -32,7 +47,7 @@ const Doctors = () => {
         userId: record.userId,
         status: status
       }, {
-        headers: { Authorization: `bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
 
       if (res.data.success) {
@@ -57,6 +72,28 @@ const Doctors = () => {
     );
     setFilteredDoctors(filteredData);
   };
+
+
+  const handleDeleteDoctor = async (record) => {
+    try {
+      const res = await axios.delete(
+        `/api/v1/admin/delete-doctor/${record._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (res.data.success) {
+        toast.success(res.data.message);
+        getDoctors();
+      }
+    } catch (error) {
+      toast.error("Delete failed");
+    }
+  };
+
 
   const columns = [
     {
@@ -86,25 +123,52 @@ const Doctors = () => {
       onFilter: (value, record) => record.status === value
     },
     {
-      title: 'Actions',
-      dataIndex: 'actions',
+      title: "Doctor Info",
       render: (_, record) => (
-        <div className='d-flex gap-2'>
-          {record.status === 'pending' ? (
+        <Button
+          type="primary"
+          size="small"
+          onClick={() => handleDoctorInfo(record)}
+        >
+          Doc Info
+        </Button>
+      ),
+    },
+
+    {
+      title: 'Actions',
+      render: (_, record) => (
+        <Space>
+          {record.status === 'pending' && (
             <>
-              <Button type='primary' onClick={() => handleAccountUpdate(record, 'approved')}>Approve</Button>
-              <Button danger onClick={() => handleAccountUpdate(record, 'rejected')}>Reject</Button>
+              <Button type='primary' onClick={() => handleAccountUpdate(record, 'approved')}>
+                Approve
+              </Button>
+              <Button danger onClick={() => handleAccountUpdate(record, 'rejected')}>
+                Reject
+              </Button>
             </>
-          ) : record.status === 'approved' ? (
-            <Button danger onClick={() => handleAccountUpdate(record, 'released')}>Release Doctor</Button>
-          ) : record.status === 'released' ? (
-            <Button type='primary' onClick={() => handleAccountUpdate(record, 'approved')}>Renew Doctor</Button>
-          ) : (
-            <Tag color='grey'>{record.status.toUpperCase()}</Tag>
           )}
-        </div>
+
+          {record.status === 'approved' && (
+            <Button danger onClick={() => handleAccountUpdate(record, 'released')}>
+              Release
+            </Button>
+          )}
+
+          {record.status === 'released' && (
+            <Button type='primary' onClick={() => handleAccountUpdate(record, 'approved')}>
+              Renew
+            </Button>
+          )}
+
+          <Button danger onClick={() => handleDeleteDoctor(record)}>
+            Delete
+          </Button>
+        </Space>
       )
     }
+    
 
   ];
 
@@ -129,6 +193,84 @@ const Doctors = () => {
         bordered
         scroll={{ x: true }}
       />
+      
+      <Modal
+        title="Doctor Information"
+        open={isDoctorInfoOpen}
+        onCancel={() => setIsDoctorInfoOpen(false)}
+        footer={null}
+        width={700}
+      >
+        {selectedDoctor && (
+          <Descriptions bordered column={1}>
+            <Descriptions.Item label="Name">
+              Dr. {selectedDoctor.firstName} {selectedDoctor.lastName}
+            </Descriptions.Item>
+
+            <Descriptions.Item label="Email">
+              {selectedDoctor.email}
+            </Descriptions.Item>
+
+            <Descriptions.Item label="Phone">
+              {selectedDoctor.phone}
+            </Descriptions.Item>
+
+            <Descriptions.Item label="Address">
+              {selectedDoctor.address}
+            </Descriptions.Item>
+
+            <Descriptions.Item label="Specialization">
+              {selectedDoctor.specialization}
+            </Descriptions.Item>
+
+            <Descriptions.Item label="Experience">
+              {selectedDoctor.experience} years
+            </Descriptions.Item>
+
+            <Descriptions.Item label="Fees">
+              ₹{selectedDoctor.feesPerConsultation}
+            </Descriptions.Item>
+
+            {/* <Descriptions.Item label="Degree Certificate">
+              {selectedDoctor.degreeCertificate ? (
+                <a
+                  href={`http://localhost:8080${selectedDoctor.degreeCertificate}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Certificate
+                </a>
+              ) : (
+                "Not Uploaded"
+              )}
+            </Descriptions.Item> */}
+
+            <Descriptions.Item label="Degree Certificate">
+              {selectedDoctor.degreeCertificate ? (
+                <div style={{ width: "100%" }}>
+                 
+                  {/* Certificate Preview */}
+            
+                  <iframe
+                    src={`http://localhost:8080/${selectedDoctor.degreeCertificate.replace(/^\/+/, "")}`}
+                    title="Certificate"
+                    style={{
+                      width: "100%",
+                      height: "350px",
+                      border: "1px solid #ddd",
+                      borderRadius: "10px"
+                    }}
+                  />
+
+                </div>
+              ) : (
+                "Not Uploaded"
+              )}
+            </Descriptions.Item>
+          </Descriptions>
+        )}
+      </Modal>
+
     </Layout>
   );
 };

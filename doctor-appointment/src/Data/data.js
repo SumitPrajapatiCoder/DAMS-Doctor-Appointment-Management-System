@@ -1,17 +1,18 @@
 
-
 export const userMenu = [
     {
-        name: 'Home',
-        path: '/',
-        icon: 'fa-solid fa-house'
+        name: "Home",
+        path: "/",
+        icon: "fa-solid fa-house",
     },
     {
-        name: 'Appointment',
-        path: '/appointment',
-        icon: 'fa-solid fa-list'
-    }
+        name: "My Appointments",
+        path: "/user/appointment",
+        icon: "fa-solid fa-calendar-check",
+    },
 ];
+
+
 
 
 export const adminMenu = [
@@ -26,10 +27,16 @@ export const adminMenu = [
         icon: 'fa-solid fa-user-doctor'
     },
     {
-        name: 'Users',
+        name: 'Registered Users',
         path: '/admin/users',
         icon: 'fa-solid fa-user'
     },
+    {
+        name: 'Patients',
+        path: '/admin/patients',
+        icon: 'fa-solid fa-user-injured'
+    }
+
 ];
 
 
@@ -38,4 +45,12 @@ export const applyAsDoctorMenu = {
     path: '/apply_doctor',
     icon: 'fa-solid fa-user-doctor'
 };
+
+export const applyAsPatientMenu = {
+    name: 'Apply As Patient',
+    path: '/apply_patient',
+    icon: 'fa-solid fa-user'
+};
+
+
 

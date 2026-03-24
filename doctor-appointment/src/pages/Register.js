@@ -42,9 +42,9 @@ const Register = () => {
         <Form.Item label="Email" name="email">
           <Input type="email" required />
         </Form.Item>
-        <Form.Item label="Password" name="password">
-          <Input type="password" required />
-        </Form.Item>
+         <Form.Item label="Password" name="password">
+                    <Input.Password required />
+                </Form.Item>
         <p className="text-center">
           <Link to="/login" className="m-4">
             Already Registered? Login Here

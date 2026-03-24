@@ -1,0 +1,166 @@
+/* =========================
+   RESET CARD LOOK
+   ========================= */
+.card {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin-bottom: 0 !important;
+  transition: background-color 0.2s ease;
+}
+
+/* =========================
+   UNREAD NOTIFICATION
+   ========================= */
+.card.bg-light.border-primary {
+  background-color: #f5faff !important; /* softer than #f0f7ff */
+  font-weight: 500;
+  position: relative;
+  padding: 12px 16px 12px 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Left indicator (thin & calm) */
+.card.bg-light.border-primary::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3px;
+  height: 100%;
+  background-color: #1677ff;
+}
+
+/* Hover — background only */
+.card.bg-light.border-primary:hover {
+  background-color: #edf4ff !important;
+}
+
+/* =========================
+   READ NOTIFICATION
+   ========================= */
+.card.bg-light.border-secondary {
+  background-color: #ffffff !important;
+  font-weight: 400;
+  padding: 12px 16px 12px 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.card.bg-light.border-secondary::before {
+  display: none;
+}
+
+.card.bg-light.border-secondary:hover {
+  background-color: #f9fafb !important;
+}
+
+/* =========================
+   TEXT HIERARCHY
+   ========================= */
+.card-text {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #1f2937;
+}
+
+.card.bg-light.border-secondary .card-text {
+  color: #6b7280;
+}
+
+/* =========================
+   REMOVE PLAYFUL EFFECTS
+   ========================= */
+.card:hover {
+  transform: none !important;
+}
+
+/* =========================
+   ANT TABS — ENTERPRISE STYLE
+   ========================= */
+.ant-tabs-tab {
+  font-weight: 500;
+  color: #6b7280 !important;
+}
+
+.ant-tabs-tab-active {
+  color: #1677ff !important;
+}
+
+.ant-tabs-ink-bar {
+  height: 2px !important;
+  background-color: #1677ff !important;
+}
+
+/* =========================
+   ACTION TEXT (NO BUTTON FEEL)
+   ========================= */
+h4.text-success,
+h4.text-danger {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+}
+
+h4.text-success:hover,
+h4.text-danger:hover {
+  text-decoration: underline;
+}
+
+/* =========================
+   EMPTY STATE
+   ========================= */
+h5.text-secondary {
+  font-size: 14px;
+  color: #9ca3af !important;
+}
+
+.card {
+  position: relative;
+  padding-right: 90px; /* space for OK button */
+}
+.card.bg-light.border-primary::after {
+  content: "OK";
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  
+  padding: 4px 14px;
+  font-size: 12px;
+  font-weight: 500;
+
+  color: #1677ff;
+  border: 1px solid #1677ff;
+  border-radius: 4px;
+
+  background-color: #ffffff;
+  pointer-events: none; /* IMPORTANT: keeps click logic intact */
+}
+
+.card.bg-light.border-secondary::after {
+  content: "OK";
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  padding: 4px 14px;
+  font-size: 12px;
+  font-weight: 500;
+
+  color: #9ca3af;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+
+  background-color: #ffffff;
+  pointer-events: none;
+}
+
+.card.bg-light.border-primary:hover::after {
+  background-color: #1677ff;
+  color: #ffffff;
+}
+
+.card.bg-light.border-secondary:hover::after {
+  background-color: #f3f4f6;
+}

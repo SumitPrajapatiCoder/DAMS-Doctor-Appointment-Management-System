@@ -1,62 +1,62 @@
 const mongoose = require("mongoose")
 
 const doctorSchema = new mongoose.Schema({
-    userId:{
-        type:String,
+    userId: {
+        type: String,
     },
-    firstName:{
-        type:String,
-        required:[true,'First Name Is Required']
+    firstName: {
+        type: String,
+        required: [true, 'First Name Is Required']
     },
     lastName: {
         type: String,
         required: [true, 'Last Name Is Required']
     },
-    phone:{
-        type:String,
-        required:[true,'Phone No. Is required']
+    phone: {
+        type: String,
+        required: [true, 'Phone No. Is required']
     },
-    email:{
-        type:String,
-        required:[true,'Email Is Required']
+    email: {
+        type: String,
+        required: [true, 'Email Is Required']
     },
-    website:{
-        type:String,
+    website: {
+        type: String,
 
     },
-    address:{
-        type:String,
-        required:[true,'Address Is Required']
+    address: {
+        type: String,
+        required: [true, 'Address Is Required']
     },
-    specialization:{
-        type:String,
-        required:[true,'specialization Is Required']
+    specialization: {
+        type: String,
+        required: [true, 'specialization Is Required']
     },
-    experience:{
-        type:String,
-        required:[true,'Experience is Required']
+    experience: {
+        type: String,
+        required: [true, 'Experience is Required']
     },
-    status:{
-        type:String,
-        default:'pending'
+    status: {
+        type: String,
+        default: 'pending'
     },
-    feesPerConsultation:{
-        type:Number,
-        required:[true,'Fee Is Required']
+    feesPerConsultation: {
+        type: Number,
+        required: [true, 'Fee Is Required']
     },
-    timings:{
-        type:Object,
-        required:[true,'Work Timing Is Required']
+    timings: {
+        type: Object,
+        required: [true, 'Work Timing Is Required']
     },
-    
+
     image: {
         type: String,
         default: "",
     },
 
-},{timestamps:true});
+}, { timestamps: true });
 
-const doctorModel = mongoose.model('doctors',doctorSchema)
+const doctorModel = mongoose.model('doctors', doctorSchema)
 
-module.exports=doctorModel
+module.exports = doctorModel
 

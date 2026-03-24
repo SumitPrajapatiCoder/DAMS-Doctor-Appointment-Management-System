@@ -17,6 +17,7 @@
     "react-dom": "^19.0.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.1.5",
+    "react-route-dom": "^5.x.x",
     "react-scripts": "5.0.1",
     "react-spinner": "^0.2.7",
     "react-spinners": "^0.15.0",

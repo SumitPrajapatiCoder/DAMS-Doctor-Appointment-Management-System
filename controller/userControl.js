@@ -4,8 +4,9 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken")
 bcrypt.setRandomFallback(require('crypto').randomBytes);
 const doctorModel = require('../models/doctorModel');
-const appointmentModel = require('../models/appointmentModel')
-const dayjs = require('dayjs')
+const appointmentModel = require('../models/appointmentModel');
+const patientModel = require('../models/PatientModel');
+
 
 // Register Controller
 const registerController = async (req, res) => {
@@ -68,39 +69,99 @@ const authController = async (req, res) => {
 };
 
 
-
+// Apply Doctor Controller
 const applyDoctorController = async (req, res) => {
     try {
-        const newDoctor = await doctorModel({
+        if (!req.body.degreeCertificate) {
+            return res.status(400).json({
+                success: false,
+                message: "Degree certificate is required",
+            });
+        }
+
+        const newDoctor = new doctorModel({
             ...req.body,
             status: "pending",
             image: req.body.image,
+            degreeCertificate: req.body.degreeCertificate,
         });
-        await newDoctor.save()
-        const adminUser = await userModel.findOne({ isAdmin: true })
-        const notification = adminUser.notification
+
+        await newDoctor.save();
+
+        const adminUser = await userModel.findOne({ isAdmin: true });
+        const notification = adminUser.notification;
+
         notification.push({
             type: 'apply-doctor-request',
             message: `${newDoctor.firstName} ${newDoctor.lastName} Has Applied For A Doctor Account`,
             data: {
                 doctorId: newDoctor._id,
-                name: newDoctor.firstName + " " + newDoctor.lastName,
-                onClickPath: '/admin/doctors'
-            }
-        })
-        await userModel.findByIdAndUpdate(adminUser._id, { notification })
-        res.status(201).send({ message: 'Doctor Account Applied Successfully', success: true })
+                name: `${newDoctor.firstName} ${newDoctor.lastName}`,
+                onClickPath: '/admin/doctors',
+            },
+        });
+
+        await userModel.findByIdAndUpdate(adminUser._id, { notification });
+
+        res.status(201).send({
+            success: true,
+            message: 'Doctor Account Applied Successfully',
+        });
 
     } catch (error) {
-        console.log(error)
-        res.status(500).send({ message: 'Error while Applying For Doctor', success: false, error })
+        console.log(error);
+        res.status(500).send({
+            success: false,
+            message: 'Error while Applying For Doctor',
+            error,
+        });
     }
-}
+};
+
+
 
 
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+
+// ===== CERTIFICATE STORAGE =====
+
+const certificateStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const dir = "public/uploads/certificates";
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        cb(null, dir);
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + "-" + file.originalname);
+    },
+});
+
+const uploadCertificate = multer({ storage: certificateStorage });
+
+// ===== CERTIFICATE UPLOAD CONTROLLER =====
+const uploadCertificateController = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: "No certificate uploaded",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            path: `/uploads/certificates/${req.file.filename}`,
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Certificate upload failed",
+        });
+    }
+};
+
 
 const imageStorage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -114,6 +175,8 @@ const imageStorage = multer.diskStorage({
     },
 });
 
+
+// Multer upload configuration
 const upload = multer({ storage: imageStorage });
 
 const uploadPhotoController = async (req, res) => {
@@ -124,6 +187,208 @@ const uploadPhotoController = async (req, res) => {
         res.status(500).json({ success: false, message: "Upload failed", error });
     }
 };
+
+
+//upload medical documents controller
+
+
+const medicalStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const dir = "public/uploads/medical";
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        cb(null, dir);
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + "-" + file.originalname);
+    },
+});
+
+const uploadMedical = multer({ storage: medicalStorage });
+
+const uploadMedicalFileController = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).send({ success: false, message: "No file uploaded" });
+        }
+
+        res.status(200).send({
+            success: true,
+            path: `/uploads${req.file.filename}`,
+        });
+    } catch (error) {
+        res.status(500).send({ success: false });
+    }
+};
+
+//apply patient Controller
+// const applyPatientController = async (req, res) => {
+//     try {
+//         const existingPatient = await patientModel.findOne({
+//             userId: req.user.id,
+//         });
+
+//         if (existingPatient) {
+//             return res.status(400).send({
+//                 success: false,
+//                 message: "Patient profile already exists",
+//             });
+//         }
+
+//         const newPatient = new patientModel({
+//             ...req.body,
+//             userId: req.user.id,
+//             status: "pending",
+//         });
+
+//         await newPatient.save();
+
+//         const adminUser = await userModel.findOne({ isAdmin: true });
+
+//         if (adminUser) {
+//             adminUser.notification.push({
+//                 type: "apply-patient-request",
+//                 message: `${req.body.firstName} applied as patient`,
+//                 data: {
+//                     patientId: newPatient._id,
+//                     onClickPath: "/admin/patients",
+//                 },
+//             });
+
+//             await adminUser.save();
+//         }
+
+//         res.status(201).send({
+//             success: true,
+//             message: "Patient profile created successfully",
+//         });
+//     } catch (error) {
+//         console.error("❌ APPLY PATIENT ERROR:", error);
+//         res.status(500).send({
+//             success: false,
+//             message: error.message,
+//         });
+//     }
+// };
+
+
+
+const applyPatientController = async (req, res) => {
+    try {
+        const { userId } = req.body;
+
+        if (!userId) {
+            return res.status(400).send({
+                success: false,
+                message: "User ID missing",
+            });
+        }
+
+        const existingPatient = await patientModel.findOne({ userId });
+
+        if (existingPatient) {
+            return res.status(400).send({
+                success: false,
+                message: "Patient profile already exists",
+            });
+        }
+
+        const newPatient = new patientModel({
+            ...req.body,
+            userId,
+            status: "pending",
+        });
+
+        await newPatient.save();
+
+        const adminUser = await userModel.findOne({ isAdmin: true });
+
+        if (adminUser) {
+            adminUser.notification.push({
+                type: "apply-patient-request",
+                message: `${req.body.firstName} applied as patient`,
+                data: {
+                    patientId: newPatient._id,
+                    onClickPath: "/admin/patients",
+                },
+            });
+            await adminUser.save();
+        }
+
+        res.status(201).send({
+            success: true,
+            message: "Patient profile created successfully",
+        });
+    } catch (error) {
+        console.error("❌ APPLY PATIENT ERROR:", error);
+        res.status(500).send({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+
+
+//Update Patient Controller
+
+const updatePatientController = async (req, res) => {
+    try {
+        const updatedPatient = await patientModel.findOneAndUpdate(
+            { userId: req.params.userId },
+            { ...req.body },
+            { new: true }
+        );
+
+        if (!updatedPatient) {
+            return res.status(404).send({
+                success: false,
+                message: "Patient profile not found",
+            });
+        }
+
+        res.status(200).send({
+            success: true,
+            message: "Patient profile updated successfully",
+            patient: updatedPatient,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            success: false,
+            message: "Error updating patient profile",
+        });
+    }
+};
+
+
+
+//Get Patient Info Controller
+const getPatientProfileController = async (req, res) => {
+    try {
+        const patient = await patientModel.findOne({
+            userId: req.params.userId,
+        });
+
+        if (!patient) {
+            return res.status(200).send({
+                success: false,
+                message: "No patient profile found",
+            });
+        }
+
+        res.status(200).send({
+            success: true,
+            patient,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            success: false,
+            message: "Error fetching patient profile",
+        });
+    }
+};
+
 
 const getAllNotificationController = async (req, res) => {
     try {
@@ -231,25 +496,31 @@ const getBookedSlotsWithStatusController = async (req, res) => {
 };
 
 
+
 const userAppointmentController = async (req, res) => {
     try {
-        const appointments = await appointmentModel.find({ userId: req.body.userId })
-            .populate('doctorId', 'firstName lastName phone specialization feesPerConsultation')
+        const appointments = await appointmentModel
+            .find({ userId: req.body.userId })
+            .populate("doctorId", "firstName lastName phone specialization feesPerConsultation")
             .sort({ date: 1 });
-        res.status(200).send({ message: 'Getting Appointment List To User SuccessFully', success: true, data: appointments })
+
+        res.status(200).send({
+            success: true,
+            data: appointments
+        });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).send({ message: 'Error User Appointment List', success: false, error })
+        res.status(500).send({ success: false });
     }
-}
+};
 
 
 const setRoleController = async (req, res) => {
     const { role } = req.body;
 
     try {
-        const user = await userModel.findOne({ _id: req.user.id });
+        const user = await userModel.findOne({ _id: req.body.userId });
+
 
         if (!user) {
             return res.status(404).send({ success: false, message: 'User not found' });
@@ -268,9 +539,9 @@ const setRoleController = async (req, res) => {
 
 
 
-
 module.exports = {
-    loginController, registerController, authController, applyDoctorController, getAllNotificationController,
+    loginController, registerController, authController, applyDoctorController, applyPatientController, getAllNotificationController,
     deleteAllNotificationController, getAllDoctorListController, bookAppointmentController, getBookedSlotsController, userAppointmentController,
-    getBookedSlotsWithStatusController, setRoleController,upload,uploadPhotoController
+    getBookedSlotsWithStatusController, setRoleController, upload, uploadMedicalFileController, uploadPhotoController, 
+    updatePatientController, getPatientProfileController, uploadCertificate, uploadCertificateController
 };

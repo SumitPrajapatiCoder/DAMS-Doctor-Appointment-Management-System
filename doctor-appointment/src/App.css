@@ -6,7 +6,7 @@
 }
 
 .btn:hover {
-    background-color: #007bff;
+    background-color: #3480c7;
     color: white;
     transform: scale(1.05);
 }
@@ -21,9 +21,11 @@
 }
 
 .ant-table-thead > tr > th {
-    background: #007bff;
+    background: #1e4fa3;
     color: white;
     font-size: 16px;
+    
+    
 }
 
 .ant-table-tbody > tr:hover {

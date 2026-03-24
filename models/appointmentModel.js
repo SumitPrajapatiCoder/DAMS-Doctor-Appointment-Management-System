@@ -4,7 +4,7 @@ const appointmentSchema=new mongoose.Schema({
   
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "user", 
+        ref: "users", 
         required: true,
     },
 
@@ -29,6 +29,14 @@ const appointmentSchema=new mongoose.Schema({
         type: String,
         required: true,
         default:'pending'
+    },
+    isPaid: {
+        type: Boolean,
+        default: false
+    },
+    paymentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "transaction"
     },
     time:{
         type:String,

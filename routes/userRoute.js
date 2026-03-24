@@ -1,13 +1,14 @@
 
 const express = require("express");
 const { loginController, registerController, authController, 
-    applyDoctorController, getAllNotificationController, deleteAllNotificationController, 
+    applyDoctorController, applyPatientController, updatePatientController, getPatientProfileController, getAllNotificationController, deleteAllNotificationController, 
     getAllDoctorListController,bookAppointmentController,
     userAppointmentController,
-    getBookedSlotsController,
+    getBookedSlotsController, uploadCertificate,
+    uploadCertificateController,
     getBookedSlotsWithStatusController,
-    setRoleController,upload,uploadPhotoController,
-    setHasRoleStatusController} = require("../controller/userControl");
+    setRoleController, upload, uploadPhotoController, uploadMedicalFileController
+    } = require("../controller/userControl");
 const authMiddleware=require("../middlewares/authMiddleware");
 
 
@@ -25,6 +26,15 @@ router.post('/get_User_data', authMiddleware, authController);
 
 //Apply Doctor
 router.post('/apply_doctor', authMiddleware, applyDoctorController);
+
+// Apply Patient
+router.post('/apply_patient', authMiddleware, applyPatientController);
+
+// Update patient profile
+router.post("/patient/update/:userId",authMiddleware,updatePatientController);
+
+// Get patient profile (for prefill)
+router.get("/patient/profile/:userId", authMiddleware, getPatientProfileController);
 
 //Upload Photo 
 router.post("/uploadPhoto", authMiddleware, upload.single("image"), uploadPhotoController);
@@ -52,9 +62,32 @@ router.post('/get_booked_slots_with_status', authMiddleware, getBookedSlotsWithS
 //Appointment List
 router.get('/user_Appointment', authMiddleware, userAppointmentController)
 
+// Upload Degree Certificate
+router.post(
+    "/uploadCertificate",
+    authMiddleware,
+    uploadCertificate.single("certificate"),
+    uploadCertificateController
+);
 
-router.put('/setRole', authMiddleware, setRoleController);
 // Route to update user's role (doctor or patient)
+router.put('/setRole', authMiddleware, setRoleController);
+
+
+// Upload Medical File
+router.post(
+    "/uploadMedicalFile",
+    authMiddleware,
+    upload.single("medicalFile"), 
+    uploadMedicalFileController
+);
 
 module.exports = router;
+
+
+
+
+
+
+
 

@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { hideLoading, showLoading } from '../Redux/features/alertSlice';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import '../style/Notification.css';
 
 function Notification() {
     const navigate = useNavigate();

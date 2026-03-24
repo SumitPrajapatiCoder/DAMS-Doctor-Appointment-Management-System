@@ -1,5 +1,4 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Layout from './../components/Layout';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
@@ -8,59 +7,79 @@ import { useDispatch, useSelector } from 'react-redux';
 import { hideLoading, showLoading } from '../Redux/features/alertSlice';
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+import "../style/BookingPage.css";
+
+
+const MySwal = withReactContent(Swal);
 
 const BookingPage = () => {
     const { user } = useSelector((state) => state.user);
     const dispatch = useDispatch();
-    const [doctor, setDoctor] = useState({});
+    const [doctor, setDoctor] = useState(null);
     const params = useParams();
     const [slots, setSlots] = useState([]);
     const [bookedSlots, setBookedSlots] = useState([]);
     const [selectedSlot, setSelectedSlot] = useState(null);
+    const [loadingDoctor, setLoadingDoctor] = useState(true);
 
     const generateDateOptions = () => {
         let dates = [];
         for (let i = 0; i < 5; i++) {
-            const dateOption = dayjs().add(i, 'day').format('DD-MM-YYYY');
-            dates.push(dateOption);
+            dates.push(dayjs().add(i, 'day').format('DD-MM-YYYY'));
         }
         return dates;
     };
 
     const dateOptions = generateDateOptions();
-    const [selectedDate, setSelectedDate] = useState(localStorage.getItem('selectedDate') || dateOptions[0]);
+
+    const [selectedDate, setSelectedDate] = useState(
+        localStorage.getItem('selectedDate') || dateOptions[0]
+    );
 
     useEffect(() => {
         localStorage.setItem('selectedDate', selectedDate);
     }, [selectedDate]);
 
-    const fetchDoctorData = async () => {
+    // ================= FETCH DOCTOR =================
+    const fetchDoctorData = useCallback(async () => {
         try {
-            const res = await axios.post("/api/v1/doctor/get_Doctor_By_Id", { doctorId: params.doctorId }, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-            });
-            if (res.data.success) setDoctor(res.data.data);
+            setLoadingDoctor(true);
+            const res = await axios.post(
+                "/api/v1/doctor/get_Doctor_By_Id",
+                { doctorId: params.doctorId },
+                { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+            );
+            if (res.data.success) {
+                setDoctor(res.data.data);
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoadingDoctor(false);
+        }
+    }, [params.doctorId]);
+
+    // ================= FETCH BOOKED SLOTS =================
+    const fetchBookedSlots = useCallback(async () => {
+        try {
+            const res = await axios.post(
+                '/api/v1/user/get_booked_Slot',
+                { doctorId: params.doctorId, date: selectedDate },
+                { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+            );
+            if (res.data.success) {
+                setBookedSlots(res.data.data);
+            }
         } catch (error) {
             console.log(error);
         }
-    };
+    }, [params.doctorId, selectedDate]);
 
-    const fetchBookedSlots = async () => {
-        try {
-            const res = await axios.post('/api/v1/user/get_booked_Slot', {
-                doctorId: params.doctorId,
-                date: selectedDate
-            }, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-            });
-            if (res.data.success) setBookedSlots(res.data.data);
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    const generateTimeSlots = () => {
-        if (!doctor.timings) return [];
+    // ================= GENERATE TIME SLOTS =================
+    const generateTimeSlots = useCallback(() => {
+        if (!doctor || !doctor.timings) return;
 
         const [start, end] = doctor.timings;
         let slotList = [];
@@ -70,7 +89,6 @@ const BookingPage = () => {
         const now = dayjs();
 
         while (currentTime.isBefore(endTime)) {
-            // Only include future time slots if the selected date is today
             if (selectedDate !== today || currentTime.isAfter(now)) {
                 slotList.push(currentTime.format('HH:mm'));
             }
@@ -78,24 +96,44 @@ const BookingPage = () => {
         }
 
         setSlots(slotList);
-    };
+    }, [doctor, selectedDate]);
 
+    // ================= BOOK APPOINTMENT =================
     const handleBooking = async (time) => {
+        const result = await MySwal.fire({
+            title: "Confirm Appointment",
+            html: `
+            <p><strong>Date:</strong> ${selectedDate}</p>
+            <p><strong>Time:</strong> ${time}</p>
+        `,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#0edb18",
+            cancelButtonColor: "#d63031",
+            confirmButtonText: "Yes, Book Appointment",
+            cancelButtonText: "Cancel",
+        });
+
+        if (!result.isConfirmed) return;
+
         try {
             dispatch(showLoading());
-            const res = await axios.post('/api/v1/user/book-appointment', {
-                doctorId: params.doctorId,
-                userId: user._id,
-                doctorInfo: doctor,
-                userInfo: user,
-                date: selectedDate,
-                time: time,
-            }, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-            });
+            const res = await axios.post(
+                '/api/v1/user/book-appointment',
+                {
+                    doctorId: params.doctorId,
+                    userId: user._id,
+                    doctorInfo: doctor,
+                    userInfo: user,
+                    date: selectedDate,
+                    time,
+                },
+                { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+            );
             dispatch(hideLoading());
+
             if (res.data.success) {
-                toast.success(res.data.message, { position: "top-right" });
+                toast.success(res.data.message);
                 setSelectedSlot(time);
                 fetchBookedSlots();
             } else {
@@ -103,94 +141,120 @@ const BookingPage = () => {
             }
         } catch (error) {
             dispatch(hideLoading());
-            toast.error("Failed to book the appointment. Try again.");
-            console.log(error);
+            toast.error("Failed to book appointment");
         }
     };
 
+    // ================= USE EFFECTS =================
     useEffect(() => {
         fetchDoctorData();
-    }, []);
+    }, [fetchDoctorData]);
 
     useEffect(() => {
-        if (doctor.timings) generateTimeSlots();
-        fetchBookedSlots();
-    }, [doctor, selectedDate]);
+        if (doctor && doctor.timings) {
+            generateTimeSlots();
+            fetchBookedSlots();
+        }
+    }, [doctor, selectedDate, generateTimeSlots, fetchBookedSlots]);
 
     const getSlotClass = (slot) => {
         const bookedSlot = bookedSlots.find((s) => s.time === slot);
         if (!bookedSlot) return 'btn-success';
-        switch (bookedSlot.status) {
-            case 'approved': return 'btn-danger';
-            case 'pending': return 'btn-warning';
-            case 'rejected': return 'btn-secondary';
-            default: return 'btn-success';
-        }
+        if (bookedSlot.status === 'approved') return 'btn-danger';
+        if (bookedSlot.status === 'pending') return 'btn-warning';
+        if (bookedSlot.status === 'rejected') return 'btn-secondary';
+        return 'btn-success';
     };
 
     return (
         <Layout>
-            <h3 className='text-center'>Booking Page</h3>
-            <div className='container'>
-                {doctor && (
-                    <div className='card p-4 shadow-sm mt-3'>
-                        <h4>Dr. {doctor.firstName} {doctor.lastName}</h4>
-                        <h5>Specialization: {doctor.specialization}</h5>
-                        <h5>Fees: ₹{doctor.feesPerConsultation}</h5>
-                        <h5>Address: {doctor.address}</h5>
-                        <h5>Available Time: {doctor.timings?.[0]} - {doctor.timings?.[1]}</h5>
+            <div className="booking-wrapper">
 
-                        <div className="mt-3 mb-3">
-                            <div className="d-flex gap-3 flex-wrap">
-                                <div className="d-flex align-items-center gap-1">
-                                    <div style={{ width: '20px', height: '20px', backgroundColor: 'green' }}></div>
-                                    <span>Free Slot</span>
-                                </div>
-                                <div className="d-flex align-items-center gap-1">
-                                    <div style={{ width: '20px', height: '20px', backgroundColor: 'red' }}></div>
-                                    <span>Approved Slot</span>
-                                </div>
-                                <div className="d-flex align-items-center gap-1">
-                                    <div style={{ width: '20px', height: '20px', backgroundColor: 'yellow' }}></div>
-                                    <span>Pending Slot</span>
-                                </div>
-                                <div className="d-flex align-items-center gap-1">
-                                    <div style={{ width: '20px', height: '20px', backgroundColor: 'grey' }}></div>
-                                    <span>Rejected Slot</span>
-                                </div>
-                            </div>
-                        </div>
+                <h3 className="booking-title text-center">
+                    Book Appointment
+                </h3>
 
-                        <div className="d-flex gap-2 mt-2 flex-wrap">
-                            {dateOptions.map((dateOption, index) => (
-                                <button
-                                    key={index}
-                                    className={`btn ${dateOption === selectedDate ? 'btn-primary' : 'btn-outline-primary'}`}
-                                    onClick={() => setSelectedDate(dateOption)}
-                                >
-                                    {dayjs(dateOption, 'DD-MM-YYYY').format('ddd, DD MMM')}
-                                </button>
-                            ))}
-                        </div>
+                <div className="booking-card">
 
-                        <div className='d-grid' style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px', marginTop: '1rem' }}>
-                            {slots.length > 0 ? (
-                                slots.map((slot, index) => (
-                                    <button
-                                        key={index}
-                                        className={`btn ${getSlotClass(slot)} ${selectedSlot === slot ? 'border border-dark' : ''}`}
-                                        onClick={() => !bookedSlots.some((s) => s.time === slot && s.status === 'approved') && handleBooking(slot)}
-                                        disabled={bookedSlots.some((s) => s.time === slot && s.status === 'approved')}
-                                    >
-                                        {dayjs(selectedDate, 'DD-MM-YYYY').format('ddd, DD MMM')} | {slot}
-                                    </button>
-                                ))
-                            ) : (
-                                <div className="alert alert-info col-12 text-center">No slots available for selected date.</div>
-                            )}
+                    {/* Doctor Header */}
+                    <div className="doctor-section">
+                        <div className="doctor-avatar">👨‍⚕️</div>
+
+                        <div className="doctor-details">
+                            <h4>
+                                Dr. {doctor?.firstName} {doctor?.lastName}
+                            </h4>
+                            <span className="doctor-specialization">
+                                {doctor?.specialization}
+                            </span>
+                            <p className="doctor-address">{doctor?.address}</p>
+                            <p className="doctor-fee">
+                                Fees: ₹ {doctor?.feesPerConsultation}
+                            </p>
+                            <p className="doctor-timing">
+                                Available: {doctor?.timings?.[0]} – {doctor?.timings?.[1]}
+                            </p>
                         </div>
                     </div>
-                )}
+
+                    {/* Selected Slot */}
+                    {selectedSlot && (
+                        <div className="selected-slot">
+                            Selected Slot: {selectedDate} at {selectedSlot}
+                        </div>
+                    )}
+
+                    {/* Legend */}
+                    <div className="slot-legend">
+                        <span className="legend free">Free</span>
+                        <span className="legend approved">Booked</span>
+                        <span className="legend pending">Pending</span>
+                        <span className="legend rejected">Rejected</span>
+                    </div>
+
+                    {/* Date Selection */}
+                    <div className="date-section">
+                        {dateOptions.map((date, index) => (
+                            <button
+                                key={index}
+                                className={`date-btn ${date === selectedDate ? "active-date" : ""
+                                    }`}
+                                onClick={() => setSelectedDate(date)}
+                            >
+                                {dayjs(date, "DD-MM-YYYY").format("ddd, DD MMM")}
+                                {index === 0 && <span className="today-tag">Today</span>}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Time Slots */}
+                    <div className="time-grid">
+                        {slots.length > 0 ? (
+                            slots.map((slot, index) => (
+                                <button
+                                    key={index}
+                                    className={`time-btn ${getSlotClass(slot)} ${selectedSlot === slot ? "active-slot" : ""
+                                        }`}
+                                    disabled={bookedSlots.some(
+                                        (s) => s.time === slot && s.status === "approved"
+                                    )}
+                                    onClick={() =>
+                                        !bookedSlots.some(
+                                            (s) => s.time === slot && s.status === "approved"
+                                        ) && handleBooking(slot)
+                                    }
+                                >
+                                    {slot}
+                                </button>
+                            ))
+                        ) : (
+                            <div className="no-slots">
+                                No slots available for this date.
+                            </div>
+                        )}
+                    </div>
+
+                </div>
             </div>
         </Layout>
     );

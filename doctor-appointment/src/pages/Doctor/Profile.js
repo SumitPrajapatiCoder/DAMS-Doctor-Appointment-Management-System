@@ -14,6 +14,8 @@ const Profile = () => {
     const { user } = useSelector((state) => state.user);
     const [doctor, setDoctor] = useState(null);
     const [imageUrl, setImageUrl] = useState("");
+    const [certificateUrl, setCertificateUrl] = useState("");
+
     const params = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -32,6 +34,7 @@ const Profile = () => {
             if (res.data.success) {
                 setDoctor(res.data.data);
                 setImageUrl(res.data.data.image);
+                setCertificateUrl(res.data.data.degreeCertificate);
             }
         } catch (error) {
             console.log(error);
@@ -45,13 +48,20 @@ const Profile = () => {
 
     const handle_Finish = async (values) => {
         try {
+            if (!certificateUrl) {
+                toast.error("Degree certificate is required");
+                return;
+            }
+
             dispatch(showLoading());
+
             const res = await axios.post(
                 "/api/v1/doctor/update_Profile",
                 {
                     ...values,
                     userId: user._id,
                     image: imageUrl,
+                    degreeCertificate: certificateUrl, // ✅ ADD THIS
                     timings: [
                         dayjs(values.timings[0]).format("HH:mm"),
                         dayjs(values.timings[1]).format("HH:mm"),
@@ -63,7 +73,9 @@ const Profile = () => {
                     },
                 }
             );
+
             dispatch(hideLoading());
+
             if (res.data.success) {
                 toast.success(res.data.message);
                 navigate("/");
@@ -72,10 +84,10 @@ const Profile = () => {
             }
         } catch (error) {
             dispatch(hideLoading());
-            console.log(error);
             toast.error("Something went wrong");
         }
     };
+
 
     return (
         <Layout>
@@ -119,6 +131,7 @@ const Profile = () => {
                             <Form.Item
                                 label="Phone No."
                                 name="phone"
+                                maxLength={10}
                                 rules={[{ required: true }]}
                             >
                                 <Input placeholder="Enter Your Phone No." />
@@ -233,13 +246,60 @@ const Profile = () => {
                             )}
                         </Col>
 
+                        <Col xs={24} md={24} lg={8}>
+                            <Upload
+                                name="certificate"
+                                showUploadList={false}
+                                customRequest={async ({ file, onSuccess, onError }) => {
+                                    try {
+                                        const formData = new FormData();
+                                        formData.append("certificate", file);
+
+                                        const res = await axios.post(
+                                            "/api/v1/user/uploadCertificate",
+                                            formData,
+                                            {
+                                                headers: {
+                                                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                                                },
+                                            }
+                                        );
+
+                                        setCertificateUrl(res.data.path);
+                                        toast.success("Certificate uploaded");
+                                        onSuccess("ok");
+                                    } catch (err) {
+                                        toast.error("Upload failed");
+                                        onError(err);
+                                    }
+                                }}
+                            >
+                                <Button icon={<UploadOutlined />}>
+                                    Upload Degree Certificate
+                                </Button>
+                            </Upload>
+
+                            {certificateUrl && (
+                                <p style={{ marginTop: 8 }}>
+                                    <a
+                                        href={`http://localhost:8080${certificateUrl}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        View Current Certificate
+                                    </a>
+                                </p>
+                            )}
+                        </Col>
+
+
                         <Col xs={24} md={24} lg={8}></Col>
                         <Col xs={24} md={24} lg={8}>
                             <button
                                 className="btn btn-primary doctor-form-btn"
                                 type="submit"
                             >
-                                Update
+                                Update Profile
                             </button>
                         </Col>
                     </Row>

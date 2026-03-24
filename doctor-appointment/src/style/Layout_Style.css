@@ -1,104 +1,194 @@
-.layout{
-     display: flex;
-     gap: 0px;
-}
-.main{
-    padding: 10px;
-    height: 100vh;
-}
-
-.sidebar{
-    min-height: 100%;
-    width: 300px;
-    border-radius: 5px;
-    background-color:rgb(99, 210, 105);
-    box-shadow: 0 0  2px gray;
-    color: white;
-    margin-right: 20px;
+/* ================= HEADER ================= */
+.header {
+  height: 70px;
+  background: linear-gradient(90deg, #2b6cb0, #1e4fa3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 25px;
+  position: sticky;
+  top: 0;
+  z-index: 999;
 }
 
-.content{
-    width: 100%;
-    height: 100%;
+.header_left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
-
-
-.body{
-    height: 85vh;
-    margin-bottom: 20px;
-    box-shadow: 0 0 2px gray;
-    background-color: white;
+.menu_toggle {
+  display: none;
+  font-size: 22px;
+  color: #fff;
+  cursor: pointer;
 }
 
-.logo h6{
-    font-size: 1.5rem;
-    margin: 20px 0px;
-    text-align: center;
-}
-.menu{
-    margin-top: 50px;
-}
-.menu_item{
-    margin-top: 30px;
-}
-.menu_item a{
-    color: white;
-    text-decoration: none;
-    font-size: 1.2rem;
-}
-.menu_item i{
-    font-size: 1.2rem;
-    margin: 0 10px;
-}
-.active{
-    background-color: white;
-    padding: 10px;
-}
-.active a,.active i{
-    color:  rgb(170, 107, 107);
+/* BRAND */
+.app_brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.header{
-    height: 10vh;
-    margin-bottom: 20px;
-    box-shadow: 0 0 2px gray;
-    background-color: white;
+.brand_logo {
+  width: 36px;
 }
 
-.header_content{
-    margin: 0 15px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    height: 50px;
-}
-.header_content i{
-    margin-right: 20px;
-    font-size: 1.2rem;
+.brand_text {
+  font-size: 22px;
+  font-weight: 600;
+  color: #fff;
 }
 
-.header_content a{
-    text-decoration: none;
-    color: blue;
-    margin: 0 10px;
-    text-transform: uppercase;
-    font-size: 1.2rem;
+/* CENTER MENU */
+.header_menu {
+  display: flex;
+  gap: 28px;
+  align-items: center;
 }
 
-.userName {
-  pointer-events: none;
+.header_link {
+  color: #fff;
   text-decoration: none;
-  color: blue;
-  margin: 0 10px;
-  text-transform: uppercase;
-  font-size: 1.2rem;
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
 }
 
-
-
-.bell-icon:hover {
-    color: rgb(255, 225, 0);
-    transform: scale(1.2); 
+.header_link::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  background: #ffd700;
+  left: 0;
+  bottom: -6px;
+  transition: 0.3s;
 }
+
+.header_link:hover::after,
+.header_link.active::after {
+  width: 100%;
+}
+
+/* LOGOUT TEXT */
+.logout_text {
+  color: #ffd700;
+  font-weight: 600;
+}
+
+/* RIGHT */
+.header_right .userName {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar {
+  position: fixed;
+  top: 70px;
+  left: -260px;
+  width: 260px;
+  height: calc(100vh - 70px);
+  background: #fff;
+  padding: 20px;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+  transition: 0.4s ease;
+  z-index: 1000;
+}
+
+.sidebar.show {
+  left: 0;
+}
+
+.sidebar_overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.3s;
+  z-index: 999;
+}
+
+.sidebar_overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sidebar_title {
+  text-align: center;
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.menu_item {
+  padding: 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #333;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.menu_item:hover {
+  background: #e6f0ff;
+}
+
+.menu_item.active {
+  background: #2b6cb0;
+  color: #fff;
+}
+
+.menu_item.logout {
+  color: #d33;
+  font-weight: 600;
+}
+
+/* ================= BODY ================= */
+.body {
+  padding: 25px;
+   min-height: calc(100vh - 70px);
+  background: linear-gradient(
+    120deg,
+    #eef4ff,
+    #f6f9ff,
+    #edf3ff
+  );
+}
+
+/* Remove bootstrap white container background */
+.container {
+  background: transparent !important;
+  padding-top: 20px;
+}
+
+/* Improve doctor grid spacing */
+.doctor-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 992px) {
+  .menu_toggle {
+    display: block;
+  }
+
+  .header_menu {
+    display: none;
+  }
+}
+
+ 
 

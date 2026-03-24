@@ -22,6 +22,11 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+
+    isPatient: {
+        type: Boolean,
+        default: false,
+    },
     notification: {
         type: Array,
         default: [],
@@ -37,9 +42,21 @@ const userSchema = new mongoose.Schema({
     hasRoleStatus: {
         type: String, 
         default: null, 
-    }
+    },
+    patientInfo: {
+        age: Number,
+        gender: String,
+        medicalHistory: [String], // ["diabetes", "heart"]
+        image: String
+    },
+    medicalHistory: {
+        type: [String], // list of specializations or conditions
+        default: [],
+    },
+
 }, { timestamps: true });
 
-const userModel = mongoose.model('user', userSchema);
+module.exports =
+    mongoose.models.users ||
+    mongoose.model("users", userSchema);
 
-module.exports = userModel;

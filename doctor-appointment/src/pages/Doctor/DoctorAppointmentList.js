@@ -27,8 +27,12 @@ const DoctorAppointmentList = () => {
             });
 
             if (res.data.success) {
-                setAppointment(res.data.data);
-                setFilteredAppointments(res.data.data);
+                const sortedAppointments = [...res.data.data].sort(
+                    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+                );
+
+                setAppointment(sortedAppointments);
+                setFilteredAppointments(sortedAppointments);
             } else {
                 console.log("No Appointments:", res.data.message);
             }
@@ -138,32 +142,60 @@ const DoctorAppointmentList = () => {
             }
         },
         {
-            title: "Action",
-            render: (text, record) => (
-                <div style={{ display: 'flex', gap: '8px' }}>
-                    {record.status === "pending" ? (
-                        <>
+            title: "Payment / Receipt",
+            render: (_, record) => {
+                if (record.status !== "approved") {
+                    return <Tag>—</Tag>;
+                }
+
+                if (!record.isPaid) {
+                    return <Tag color="gold">AWAITING PAYMENT</Tag>;
+                }
+
+                return (
+                    <>
+                        <Tag color="green">PAID</Tag>
+                        <br />
+                        <button
+                            className="btn btn-link p-0"
+                            onClick={() => navigate(`/receipt/${record.paymentId}`)}
+                        >
+                            View Receipt
+                        </button>
+                    </>
+                );
+            }
+        },
+        {
+            title: "Appointment Action",
+            render: (_, record) => {
+                if (record.status === "pending") {
+                    return (
+                        <div style={{ display: "flex", gap: 8 }}>
                             <button
                                 className="btn btn-success"
                                 onClick={() => handleStatus(record, "approved")}
                             >
-                             Approve
+                                Approve
                             </button>
                             <button
                                 className="btn btn-danger"
                                 onClick={() => handleStatus(record, "rejected")}
                             >
-                            Reject
+                                Reject
                             </button>
-                        </>
-                    ) : (
-                        <Tag color={record.status === "approved" ? "green" : "volcano"}>
-                            {record.status.toUpperCase()}
-                        </Tag>
-                    )}
-                </div>
-            ),
+                        </div>
+                    );
+                }
+
+                if (record.status === "approved") {
+                    return <Tag color="green">APPROVED</Tag>;
+                }
+
+                return <Tag color="volcano">REJECTED</Tag>;
+            }
         },
+
     ];
 
     return (

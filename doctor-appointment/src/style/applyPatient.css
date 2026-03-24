@@ -1,0 +1,64 @@
+.center-spin {
+  display: flex;
+  justify-content: center;
+  margin-top: 80px;
+}
+
+/* VIEW MODE */
+.profile-view {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.profile-card {
+  width: 100%;
+  max-width: 520px;
+  padding: 25px;
+  border-radius: 16px;
+  text-align: center;
+  animation: fadeUp 0.4s ease;
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 12px;
+  border: 4px solid #e6f0ff;
+}
+
+.profile-info {
+  text-align: left;
+  margin: 20px 0;
+  line-height: 1.9;
+}
+
+/* EDIT FORM */
+.profile-form {
+  max-width: 1000px;
+  margin: auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 16px;
+  animation: fadeUp 0.4s ease;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
